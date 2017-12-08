@@ -24,4 +24,10 @@ export default Ember.Component.extend({
   statsType: null,
 
   searchText: Ember.computed.oneWay("statsType"),
+  _statsType: Ember.computed("statsType", function () {
+    var type = this.get("statsType");
+    if(type) {
+      return Ember.String.capitalize(type.toLowerCase());
+    }
+  })
 });

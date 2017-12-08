@@ -565,7 +565,7 @@ class FetcherOrderedGrouped extends CallableWithNdc<Void> {
             endTime - startTime, mapOutput, false);
       }
       remaining.remove(inputAttemptIdentifier.toString());
-    } catch(IOException | InternalError ioe) {
+    } catch(IOException ioe) {
       if (stopped) {
         if (LOG.isDebugEnabled()) {
           LOG.debug("Not reporting fetch failure for exception during data copy: ["
@@ -614,7 +614,7 @@ class FetcherOrderedGrouped extends CallableWithNdc<Void> {
    * @return true to indicate connection retry. false otherwise.
    * @throws IOException
    */
-  private boolean shouldRetry(MapHost host, Throwable ioe) {
+  private boolean shouldRetry(MapHost host, IOException ioe) {
     if (!(ioe instanceof SocketTimeoutException)) {
       return false;
     }
@@ -723,7 +723,7 @@ class FetcherOrderedGrouped extends CallableWithNdc<Void> {
             long endTime = System.currentTimeMillis();
             scheduler.copySucceeded(srcAttemptId, host, indexRecord.getPartLength(),
                 indexRecord.getRawLength(), (endTime - startTime), mapOutput, true);
-          } catch (IOException | InternalError e) {
+          } catch (IOException e) {
             if (mapOutput != null) {
               mapOutput.abort();
             }

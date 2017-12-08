@@ -638,10 +638,19 @@ public class TezMerger {
     }
 
     public boolean next() throws IOException {
-      if (!hasNext()) {
+      if (size() == 0)
         return false;
-      }
 
+      if (minSegment != null) {
+        //minSegment is non-null for all invocations of next except the first
+        //one. For the first invocation, the priority queue is ready for use
+        //but for the subsequent invocations, first adjust the queue 
+        adjustPriorityQueue(minSegment);
+        if (size() == 0) {
+          minSegment = null;
+          return false;
+        }
+      }
       minSegment = top();
       long startPos = minSegment.getPosition();
       KeyValueBuffer nextKey = minSegment.getKey();
@@ -1027,24 +1036,6 @@ public class TezMerger {
       return (hasNext != null) && (hasNext == KeyState.SAME_KEY);
     }
 
-    public boolean hasNext() throws IOException {
-      if (size() == 0)
-        return false;
-
-      if (minSegment != null) {
-        //minSegment is non-null for all invocations of next except the first
-        //one. For the first invocation, the priority queue is ready for use
-        //but for the subsequent invocations, first adjust the queue
-        adjustPriorityQueue(minSegment);
-        if (size() == 0) {
-          minSegment = null;
-          return false;
-        }
-      }
-
-      return true;
-    }
-
   }
 
   private static class EmptyIterator implements TezRawKeyValueIterator {
@@ -1066,11 +1057,6 @@ public class TezMerger {
 
     @Override
     public boolean next() throws IOException {
-      return false;
-    }
-
-    @Override
-    public boolean hasNext() throws IOException {
       return false;
     }
 

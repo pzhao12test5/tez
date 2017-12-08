@@ -234,9 +234,7 @@ public class FairShuffleVertexManager extends ShuffleVertexManagerBase {
     } else {
       for (int i = 0; i < numOfPartitions; i++) {
         estimatedPartitionOutputSize[i] =
-            getExpectedStatsAtIndex(i);
-        LOG.info("Partition index {} with size {}", i,
-            estimatedPartitionOutputSize[i]);
+            MB * getExpectedStatsAtIndex(i);
       }
     }
     return estimatedPartitionOutputSize;
@@ -421,12 +419,9 @@ public class FairShuffleVertexManager extends ShuffleVertexManagerBase {
         }
         Iterator<DestinationTaskInputsProperty> it = iterator();
         while(it.hasNext()) {
-          DestinationTaskInputsProperty property = it.next();
           sourceVertexInfo.getDestinationInputsProperties().put(
-              destinationIndex, property);
+              destinationIndex,it.next());
           destinationIndex++;
-          LOG.info("Destination Index {}: Input Property {}",
-              destinationIndex, property);
         }
         startNextPartitionsGroup();
       }

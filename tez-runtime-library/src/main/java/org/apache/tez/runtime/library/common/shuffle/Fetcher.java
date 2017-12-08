@@ -683,7 +683,7 @@ public class Fetcher extends CallableWithNdc<FetchResult> {
           long endTime = System.currentTimeMillis();
           fetcherCallback.fetchSucceeded(host, srcAttemptId, fetchedInput, idxRecord.getPartLength(),
               idxRecord.getRawLength(), (endTime - startTime));
-        } catch (IOException | InternalError e) {
+        } catch (IOException e) {
           hasFailures = true;
           cleanupFetchedInput(fetchedInput);
           if (isShutDown.get()) {
@@ -980,7 +980,7 @@ public class Fetcher extends CallableWithNdc<FetchResult> {
         // metrics.successFetch();
       }
       srcAttemptsRemaining.remove(inputAttemptIdentifier.toString());
-    } catch (IOException | InternalError ioe) {
+    } catch (IOException ioe) {
       if (isShutDown.get()) {
         cleanupFetchedInput(fetchedInput);
         if (isDebugEnabled) {
@@ -1037,7 +1037,7 @@ public class Fetcher extends CallableWithNdc<FetchResult> {
    * @return true to indicate connection retry. false otherwise.
    * @throws IOException
    */
-  private boolean shouldRetry(InputAttemptIdentifier srcAttemptId, Throwable ioe) {
+  private boolean shouldRetry(InputAttemptIdentifier srcAttemptId, IOException ioe) {
     if (!(ioe instanceof SocketTimeoutException)) {
       return false;
     }

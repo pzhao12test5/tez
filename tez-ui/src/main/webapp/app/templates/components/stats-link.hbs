@@ -17,15 +17,9 @@
 }}
 
 {{#if value}}
-  {{#if searchText}}
-    {{#link-to routeName (query-params searchText=searchText)}}
-      {{txt value type="number"}}
-    {{/link-to}}
-  {{else}}
-    {{#link-to routeName}}
-      {{txt value type="number"}}
-    {{/link-to}}
-  {{/if}}
+  {{#link-to routeName (query-params searchText=searchText)}}
+    {{txt value type="number"}} {{_statsType}}
+  {{/link-to}}
 {{else}}
   {{txt value type="number"}}
 {{/if}}

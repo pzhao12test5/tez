@@ -148,14 +148,9 @@ abstract class ShuffleVertexManagerBase extends VertexManagerPlugin {
     int getNumCompletedTasks() {
       return finishedTaskSet.cardinality();
     }
-
-    BigInteger getExpectedStatsAtIndex(int index) {
+    int getExpectedStatsInMBAtIndex(int index) {
       return (numVMEventsReceived == 0) ?
-         BigInteger.ZERO :
-         BigInteger.valueOf(statsInMB[index]).
-           multiply(BigInteger.valueOf(numTasks)).
-           divide(BigInteger.valueOf(numVMEventsReceived)).
-           multiply(BigInteger.valueOf(MB));
+          0: statsInMB[index] * numTasks / numVMEventsReceived;
     }
   }
 
@@ -469,17 +464,12 @@ abstract class ShuffleVertexManagerBase extends VertexManagerPlugin {
     return stats;
   }
 
-  long getExpectedStatsAtIndex(int index) {
-    BigInteger stats = BigInteger.ZERO;
+  int getExpectedStatsAtIndex(int index) {
+    int stats = 0;
     for(SourceVertexInfo entry : getAllSourceVertexInfo()) {
-      stats = stats.add(entry.getExpectedStatsAtIndex(index));
+      stats += entry.getExpectedStatsInMBAtIndex(index);
     }
-    if (stats.compareTo(BigInteger.valueOf(Long.MAX_VALUE)) > 0) {
-      LOG.warn("Partition {}'s size {} exceeded Long.MAX_VALUE", index, stats);
-      return Long.MAX_VALUE;
-    } else {
-      return stats.longValue();
-    }
+    return stats;
   }
 
   /**

@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.apache.tez.dag.api.oldrecords.TaskState;
 import org.apache.tez.dag.history.HistoryEvent;
 import org.apache.tez.dag.history.HistoryEventType;
 import org.apache.tez.dag.records.TezTaskID;
@@ -34,20 +33,13 @@ public class TaskStartedEvent implements HistoryEvent {
   private String vertexName;
   private long scheduledTime;
   private long startTime;
-  private TaskState state;
 
   public TaskStartedEvent(TezTaskID taskId,
       String vertexName, long scheduledTime, long startTime) {
-    this(taskId, vertexName, scheduledTime, startTime, TaskState.SCHEDULED);
-  }
-
-  public TaskStartedEvent(TezTaskID taskId,
-      String vertexName, long scheduledTime, long startTime, TaskState state) {
     this.vertexName = vertexName;
     this.taskID = taskId;
     this.scheduledTime = scheduledTime;
     this.startTime = startTime;
-    this.state = state;
   }
 
   public TaskStartedEvent() {
@@ -116,7 +108,4 @@ public class TaskStartedEvent implements HistoryEvent {
     return startTime;
   }
 
-  public TaskState getState() {
-    return state;
-  }
 }

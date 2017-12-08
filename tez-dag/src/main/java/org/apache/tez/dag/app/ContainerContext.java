@@ -129,24 +129,26 @@ public class ContainerContext {
   // classpath modification
   private static boolean localResourcesCompatible(Map<String, LocalResource> srcLRs,
       Map<String, LocalResource> reqLRs) {
-    for (Entry<String, LocalResource> reqLREntry : reqLRs.entrySet()) {
-      LocalResource requestedLocalResource = srcLRs.get(reqLREntry.getKey());
-      if (requestedLocalResource == null) {
-        LocalResource lr = reqLREntry.getValue();
-        if (!LocalResourceType.FILE.equals(lr.getType())) {
-          if (LOG.isDebugEnabled()) {
-            LOG.debug("Cannot match container: Additional local resource needed is not of type FILE"
-                + ", resourceName: " + reqLREntry.getKey()
-                + ", resourceDetails: " + reqLREntry);
-          }
-          return false;
-        }
-      } else if(!reqLREntry.getValue().equals(requestedLocalResource)) {
+    Map<String, LocalResource> reqLRsCopy = new HashMap<String, LocalResource>(reqLRs);
+    for (Entry<String, LocalResource> srcLREntry : srcLRs.entrySet()) {
+      LocalResource requestedLocalResource = reqLRsCopy.remove(srcLREntry.getKey());
+      if (requestedLocalResource != null && !srcLREntry.getValue().equals(requestedLocalResource)) {
         if (LOG.isDebugEnabled()) {
           LOG.debug("Cannot match container: Attempting to use same target resource name: "
-              + reqLREntry.getKey()
+              + srcLREntry.getKey()
               + ", but with different source resources. Already localized: "
-              + requestedLocalResource + ", requested: " + reqLREntry.getValue());
+              + srcLREntry.getValue() + ", requested: " + requestedLocalResource);
+        }
+        return false;
+      }
+    }
+    for (Entry<String, LocalResource> additionalLREntry : reqLRsCopy.entrySet()) {
+      LocalResource lr = additionalLREntry.getValue();
+      if (EnumSet.of(LocalResourceType.ARCHIVE, LocalResourceType.PATTERN).contains(lr.getType())) {
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("Cannot match container: Additional local resource needed is not of type FILE"
+              + ", resourceName: " + additionalLREntry.getKey()
+              + ", resourceDetails: " + additionalLREntry);
         }
         return false;
       }
@@ -159,14 +161,24 @@ public class ContainerContext {
     for (Entry<K, V> oEntry : matchMap.entrySet()) {
       K oKey = oEntry.getKey();
       V oVal = oEntry.getValue();
-      V srcVal = srcMap.get(oKey);
-      if (!oVal.equals(srcVal)) {
-        if (LOG.isDebugEnabled()) {
-          LOG.debug("Incompatible container context"
+      if (srcMap.containsKey(oKey)) {
+        if (!oVal.equals(srcMap.get(oKey))) {
+          if (LOG.isDebugEnabled()) {
+            LOG.debug("Incompatible container context"
               + ", matchInfo=" + matchInfo
               + ", thisKey=" + oKey
-              + ", thisVal=" + srcVal
+              + ", thisVal=" + srcMap.get(oKey)
               + ", otherVal=" + oVal);
+          }
+          return false;
+        }
+      } else {
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("Incompatible container context"
+            + ", matchInfo=" + matchInfo
+            + ", thisKey=" + oKey
+            + ", thisVal=null"
+            + ", otherVal=" + oVal);
         }
         return false;
       }

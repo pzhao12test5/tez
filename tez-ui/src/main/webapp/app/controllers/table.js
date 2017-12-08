@@ -51,8 +51,7 @@ export default AbstractController.extend({
       searchText: this.get("searchText"),
       sortColumnId: this.get("sortColumnId"),
       sortOrder: this.get("sortOrder"),
-      pageNo: this.get("pageNo"),
-      headerAsSortButton: true,
+      pageNo: this.get("pageNo")
     });
   }),
 

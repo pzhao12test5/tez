@@ -521,7 +521,9 @@ public class VertexInfo extends BaseInfo {
     }
     Collections.sort(taskInfoList, new Comparator<TaskInfo>() {
       @Override public int compare(TaskInfo o1, TaskInfo o2) {
-        return Long.compare(o1.getStartTimeInterval(), o2.getStartTimeInterval());
+        return (o1.getStartTimeInterval() < o2.getStartTimeInterval()) ? -1 :
+            ((o1.getStartTimeInterval() == o2.getStartTimeInterval()) ?
+                0 : 1);
       }
     });
     return taskInfoList.get(0);
@@ -539,7 +541,9 @@ public class VertexInfo extends BaseInfo {
     }
     Collections.sort(taskInfoList, new Comparator<TaskInfo>() {
       @Override public int compare(TaskInfo o1, TaskInfo o2) {
-        return -1 * Long.compare(o1.getFinishTimeInterval(), o2.getFinishTimeInterval());
+        return (o1.getFinishTimeInterval() > o2.getFinishTimeInterval()) ? -1 :
+            ((o1.getStartTimeInterval() == o2.getStartTimeInterval()) ?
+                0 : 1);
       }
     });
     return taskInfoList.get(0);
@@ -585,7 +589,8 @@ public class VertexInfo extends BaseInfo {
   private Ordering<TaskInfo> orderingOnTimeTaken() {
     return Ordering.from(new Comparator<TaskInfo>() {
       @Override public int compare(TaskInfo o1, TaskInfo o2) {
-        return Long.compare(o1.getTimeTaken(), o2.getTimeTaken());
+        return (o1.getTimeTaken() < o2.getTimeTaken()) ? -1 :
+            ((o1.getTimeTaken() == o2.getTimeTaken()) ? 0 : 1);
       }
     });
   }
@@ -593,7 +598,8 @@ public class VertexInfo extends BaseInfo {
   private Ordering<TaskInfo> orderingOnStartTime() {
     return Ordering.from(new Comparator<TaskInfo>() {
       @Override public int compare(TaskInfo o1, TaskInfo o2) {
-        return Long.compare(o1.getStartTimeInterval(), o2.getStartTimeInterval());
+        return (o1.getStartTimeInterval() < o2.getStartTimeInterval()) ? -1 :
+            ((o1.getStartTimeInterval() == o2.getStartTimeInterval()) ? 0 : 1);
       }
     });
   }
@@ -601,7 +607,8 @@ public class VertexInfo extends BaseInfo {
   private Ordering<TaskAttemptInfo> orderingOnAttemptStartTime() {
     return Ordering.from(new Comparator<TaskAttemptInfo>() {
       @Override public int compare(TaskAttemptInfo o1, TaskAttemptInfo o2) {
-        return Long.compare(o1.getStartTimeInterval(), o2.getStartTimeInterval());
+        return (o1.getStartTimeInterval() < o2.getStartTimeInterval()) ? -1 :
+            ((o1.getStartTimeInterval() == o2.getStartTimeInterval()) ? 0 : 1);
       }
     });
   }

@@ -118,35 +118,24 @@ public class TestShuffleVertexManagerUtils {
   }
 
   VertexManagerEvent getVertexManagerEvent(long[] sizes,
-      long inputSize, String vertexName) throws IOException {
-    return getVertexManagerEvent(sizes, inputSize, vertexName, false);
+      long totalSize, String vertexName) throws IOException {
+    return getVertexManagerEvent(sizes, totalSize, vertexName, false);
   }
 
-  VertexManagerEvent getVertexManagerEvent(long[] partitionSizes,
-      long uncompressedTotalSize, String vertexName, boolean reportDetailedStats)
+  VertexManagerEvent getVertexManagerEvent(long[] sizes,
+      long totalSize, String vertexName, boolean reportDetailedStats)
       throws IOException {
     ByteBuffer payload;
-    long totalSize = 0;
-    // Use partition sizes to compute the total size.
-    if (partitionSizes != null) {
-      totalSize = estimatedUncompressedSum(partitionSizes);
-    } else {
-      totalSize = uncompressedTotalSize;
-    }
-    if (partitionSizes != null) {
-      RoaringBitmap partitionStats =
-          ShuffleUtils.getPartitionStatsForPhysicalOutput(partitionSizes);
+    if (sizes != null) {
+      RoaringBitmap partitionStats = ShuffleUtils.getPartitionStatsForPhysicalOutput(sizes);
       DataOutputBuffer dout = new DataOutputBuffer();
       partitionStats.serialize(dout);
       ByteString
-          partitionStatsBytes = TezCommonUtils.compressByteArrayToByteString(
-              dout.getData());
+          partitionStatsBytes = TezCommonUtils.compressByteArrayToByteString(dout.getData());
       if (reportDetailedStats) {
         payload = VertexManagerEventPayloadProto.newBuilder()
             .setOutputSize(totalSize)
-            .setDetailedPartitionStats(
-                ShuffleUtils.getDetailedPartitionStatsForPhysicalOutput(
-                    partitionSizes))
+            .setDetailedPartitionStats(ShuffleUtils.getDetailedPartitionStatsForPhysicalOutput(sizes))
             .build().toByteString()
             .asReadOnlyByteBuffer();
       } else {
@@ -168,16 +157,6 @@ public class TestShuffleVertexManagerUtils {
     VertexManagerEvent vmEvent = VertexManagerEvent.create(vertexName, payload);
     vmEvent.setProducerAttemptIdentifier(taId);
     return vmEvent;
-  }
-
-  // Assume 3 : 1 compression ratio to estimate the total size
-  // of all partitions.
-  long estimatedUncompressedSum(long[] partitionStats) {
-    long sum = 0;
-    for (long partition : partitionStats) {
-      sum += partition;
-    }
-    return sum * 3;
   }
 
   public static TaskAttemptIdentifier createTaskAttemptIdentifier(String vName, int tId) {

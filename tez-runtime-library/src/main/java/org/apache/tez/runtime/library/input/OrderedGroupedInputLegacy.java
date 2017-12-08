@@ -58,11 +58,6 @@ public class OrderedGroupedInputLegacy extends OrderedGroupedKVInput {
         }
 
         @Override
-        public boolean hasNext() throws IOException {
-          return false;
-        }
-
-        @Override
         public void close() throws IOException {
         }
 
