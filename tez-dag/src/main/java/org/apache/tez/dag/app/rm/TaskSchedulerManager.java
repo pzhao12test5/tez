@@ -684,14 +684,12 @@ public class TaskSchedulerManager extends AbstractService implements
 
   public void initiateStop() {
     for (int i = 0 ; i < taskSchedulers.length ; i++) {
-      if (taskSchedulers[i] != null) {
-        try {
-          taskSchedulers[i].getTaskScheduler().initiateStop();
-        } catch (Exception e) {
-          // Ignore for now as scheduler stop invoked on shutdown
-          LOG.error("Failed to do a clean initiateStop for Scheduler: "
-              + Utils.getTaskSchedulerIdentifierString(i, appContext), e);
-        }
+      try {
+        taskSchedulers[i].getTaskScheduler().initiateStop();
+      } catch (Exception e) {
+        // Ignore for now as scheduler stop invoked on shutdown
+        LOG.error("Failed to do a clean initiateStop for Scheduler: "
+            + Utils.getTaskSchedulerIdentifierString(i, appContext), e);
       }
     }
   }
@@ -980,21 +978,13 @@ public class TaskSchedulerManager extends AbstractService implements
   }
 
   public boolean hasUnregistered() {
-    // Only return true if all task schedulers that were registered successfully unregister
-    if (taskSchedulers.length == 0) {
-      return false;
-    }
     boolean result = true;
-    for (int i = 0; i < taskSchedulers.length; i++) {
+    for (int i = 0 ; i < taskSchedulers.length ; i++) {
       // Explicitly not catching any exceptions around this API
       // No clear route to recover. Better to crash.
-      if (taskSchedulers[i] == null) {
-        return false;
-      }
       try {
         result = result & this.taskSchedulers[i].hasUnregistered();
       } catch (Exception e) {
-        result = false;
         String msg = "Error in TaskScheduler when checking if a scheduler has unregistered"
             + ", scheduler=" + Utils.getTaskSchedulerIdentifierString(i, appContext);
         LOG.error(msg, e);

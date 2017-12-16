@@ -87,8 +87,8 @@ public class HistoryEventTimelineConversion {
             convertContainerStoppedEvent((ContainerStoppedEvent) historyEvent));
       case DAG_SUBMITTED:
         return Lists.newArrayList(
-            convertDAGSubmittedEvent((DAGSubmittedEvent)historyEvent),
-            convertDAGSubmittedToDAGExtraInfoEntity((DAGSubmittedEvent)historyEvent));
+            convertDAGSubmittedToDAGExtraInfoEntity((DAGSubmittedEvent)historyEvent),
+            convertDAGSubmittedEvent((DAGSubmittedEvent)historyEvent));
       case DAG_INITIALIZED:
         return Collections.singletonList(
             convertDAGInitializedEvent((DAGInitializedEvent) historyEvent));
@@ -96,8 +96,8 @@ public class HistoryEventTimelineConversion {
         return Collections.singletonList(convertDAGStartedEvent((DAGStartedEvent) historyEvent));
       case DAG_FINISHED:
         return Lists.newArrayList(
-            convertDAGFinishedEvent((DAGFinishedEvent) historyEvent),
-            convertDAGFinishedToDAGExtraInfoEntity((DAGFinishedEvent) historyEvent));
+            convertDAGFinishedToDAGExtraInfoEntity((DAGFinishedEvent) historyEvent),
+            convertDAGFinishedEvent((DAGFinishedEvent) historyEvent));
       case VERTEX_INITIALIZED:
         return Collections.singletonList(
             convertVertexInitializedEvent((VertexInitializedEvent) historyEvent));
