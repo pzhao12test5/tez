@@ -23,18 +23,26 @@ export default Ember.Service.extend({
   env: Ember.inject.service("env"),
 
   correctProtocol: function (url, localProto) {
-    var index = url.indexOf("://");
-    if(index === -1) {
-      localProto = localProto || window.location.protocol;
-      return localProto + "//" + url;
+    var urlProto;
+
+    localProto = localProto || window.location.protocol;
+
+    if(url.match("://")) {
+      urlProto = url.substr(0, url.indexOf("//"));
     }
-    var urlProto = url.substr(0, index + 1);
-    if(urlProto === "file:") {
-      urlProto = localProto || "http:";
-      url = url.substr(index + 3);
-      return urlProto + "//" + url;
+
+    if(localProto === "file:") {
+      urlProto = urlProto || "http:";
     }
-    return url;
+    else {
+      urlProto = localProto;
+    }
+
+    if(url.match("://")) {
+      url = url.substr(url.indexOf("://") + 3);
+    }
+
+    return urlProto + "//" + url;
   },
 
   normalizeURL: function (url) {

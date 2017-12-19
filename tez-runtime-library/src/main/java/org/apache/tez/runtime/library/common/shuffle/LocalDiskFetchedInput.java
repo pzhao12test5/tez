@@ -39,27 +39,15 @@ public class LocalDiskFetchedInput extends FetchedInput {
   private final Path inputFile;
   private final FileSystem localFS;
   private final long startOffset;
-  private final long size;
 
-  public LocalDiskFetchedInput(long startOffset, long compressedSize,
+  public LocalDiskFetchedInput(long startOffset, long actualSize, long compressedSize,
                                InputAttemptIdentifier inputAttemptIdentifier, Path inputFile,
                                Configuration conf, FetchedInputCallback callbackHandler)
       throws IOException {
-    super(inputAttemptIdentifier, callbackHandler);
-    this.size = compressedSize;
+    super(Type.DISK_DIRECT, actualSize, compressedSize, inputAttemptIdentifier, callbackHandler);
     this.startOffset = startOffset;
     this.inputFile = inputFile;
     localFS = FileSystem.getLocal(conf);
-  }
-
-  @Override
-  public Type getType() {
-    return Type.DISK_DIRECT;
-  }
-
-  @Override
-  public long getSize() {
-    return size;
   }
 
   @Override
@@ -71,21 +59,21 @@ public class LocalDiskFetchedInput extends FetchedInput {
   public InputStream getInputStream() throws IOException {
     FSDataInputStream inputStream = localFS.open(inputFile);
     inputStream.seek(startOffset);
-    return new BoundedInputStream(inputStream, getSize());
+    return new BoundedInputStream(inputStream, compressedSize);
   }
 
   @Override
   public void commit() {
-    if (isState(State.PENDING)) {
-      setState(State.COMMITTED);
+    if (state == State.PENDING) {
+      state = State.COMMITTED;
       notifyFetchComplete();
     }
   }
 
   @Override
   public void abort() {
-    if (isState(State.PENDING)) {
-      setState(State.ABORTED);
+    if (state == State.PENDING) {
+      state = State.ABORTED;
       notifyFetchFailure();
     }
   }
@@ -93,10 +81,10 @@ public class LocalDiskFetchedInput extends FetchedInput {
   @Override
   public void free() {
     Preconditions.checkState(
-        isState(State.COMMITTED) || isState(State.ABORTED),
+        state == State.COMMITTED || state == State.ABORTED,
         "FetchedInput can only be freed after it is committed or aborted");
-    if (isState(State.COMMITTED)) { // ABORTED would have already called cleanup
-      setState(State.FREED);
+    if (state == State.COMMITTED) { // ABORTED would have already called cleanup
+      state = State.FREED;
       notifyFreedResource();
     }
   }
@@ -105,11 +93,12 @@ public class LocalDiskFetchedInput extends FetchedInput {
   public String toString() {
     return "LocalDiskFetchedInput [inputFile path =" + inputFile +
         ", offset" + startOffset +
-        ", compressedSize=" + getSize() +
-        ", inputAttemptIdentifier=" + getInputAttemptIdentifier() +
-        ", type=" + getType() +
-        ", id=" + getId() +
-        ", state=" + getState() + "]";
+        ", actualSize=" + actualSize +
+        ", compressedSize=" + compressedSize +
+        ", inputAttemptIdentifier=" + inputAttemptIdentifier +
+        ", type=" + type +
+        ", id=" + id +
+        ", state=" + state + "]";
   }
 
   @VisibleForTesting

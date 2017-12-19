@@ -60,7 +60,7 @@
   <gib.commitRange>${env.TRAVIS_COMMIT_RANGE}</gib.commitRange>
         <gib.enabled>true</gib.enabled>
         <gib.useEkstazi>true</gib.useEkstazi>
-        <gib.excludePathRegex>(.*\.txt$)|(.*\.md$)|(.*\.html$)|(.*\.rst$)|(.*\.scss$)|(.*\.css$)|(.*\.png$)|(.*\.py$)|(.*README$)|(.*\.jpg$)|(.*\.jpeg$)|(.*NOTICE$)|(.*\.gitignore$)</gib.excludePathRegex>
+        <gib.excludePathRegex>(.*\.apt$)|(.*\.txt$)|(.*\.md$)|(.*\.html$)|(.*\.rst$)|(.*\.scss$)|(.*\.css$)|(.*\.png$)|(.*\.py$)|(.*README$)|(.*\.jpg$)|(.*\.jpeg$)|(.*NOTICE$)|(.*\.gitignore$)</gib.excludePathRegex>
     </properties>
   <scm>
     <connection>${scm.url}</connection>
@@ -871,9 +871,9 @@
               <exclude>**/*.png</exclude>
               <exclude>**/*.pptx</exclude>
               <exclude>**/*TestIFile_concatenated_compressed.bin</exclude>
-            <exclude>**/.ekstazi/**</exclude>
+            <exclude>**/NOW</exclude>
                             <exclude>**/.travis.yml</exclude>
-                            <exclude>**/NOW</exclude>
+                            <exclude>**/.ekstazi/**</exclude>
                         </excludes>
           </configuration>
         </plugin>
