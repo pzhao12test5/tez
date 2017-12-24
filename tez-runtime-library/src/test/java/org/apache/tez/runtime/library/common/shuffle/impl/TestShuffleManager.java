@@ -22,7 +22,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -194,26 +193,6 @@ public class TestShuffleManager {
     verify(inputContext).createTezFrameworkExecutorService(anyInt(), anyString());
   }
 
-  @Test (timeout = 20000)
-  public void testProgressWithEmptyPendingHosts() throws Exception {
-    InputContext inputContext = createInputContext();
-    final ShuffleManager shuffleManager = spy(createShuffleManager(inputContext, 1));
-    Thread schedulerGetHostThread = new Thread(new Runnable() {
-      @Override
-      public void run() {
-        try {
-          shuffleManager.run();
-          } catch (Exception e) {
-          e.printStackTrace();
-        }
-      }
-    });
-    schedulerGetHostThread.start();
-    Thread.currentThread().sleep(1000 * 3 + 1000);
-    schedulerGetHostThread.interrupt();
-    verify(inputContext, atLeast(3)).notifyProgress();
-  }
-
   private ShuffleManagerForTest createShuffleManager(
       InputContext inputContext, int expectedNumOfPhysicalInputs)
           throws IOException {
@@ -298,17 +277,7 @@ public class TestShuffleManager {
   static class TestFetchedInput extends FetchedInput {
 
     public TestFetchedInput(InputAttemptIdentifier inputAttemptIdentifier) {
-      super(inputAttemptIdentifier, null);
-    }
-
-    @Override
-    public long getSize() {
-      return -1;
-    }
-
-    @Override
-    public Type getType() {
-      return Type.MEMORY;
+      super(Type.MEMORY, -1, -1, inputAttemptIdentifier, null);
     }
 
     @Override

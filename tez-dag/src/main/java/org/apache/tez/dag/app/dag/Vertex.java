@@ -206,6 +206,5 @@ public interface Vertex extends Comparable<Vertex> {
   interface VertexConfig {
     int getMaxFailedTaskAttempts();
     boolean getTaskRescheduleHigherPriority();
-    boolean getTaskRescheduleRelaxedLocality();
   }
 }
